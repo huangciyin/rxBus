@@ -1,4 +1,4 @@
-package me.streamis.rxbus.test;
+package me.streamis.rxbus.test.dummy;
 
 import me.streamis.rxbus.RxExceptionHandler;
 import org.vertx.java.core.json.JsonObject;

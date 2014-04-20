@@ -2,6 +2,7 @@ package me.streamis.rxbus.test;
 
 import me.streamis.rxbus.RxEventBus;
 import me.streamis.rxbus.RxMessage;
+import me.streamis.rxbus.test.dummy.*;
 import org.junit.Test;
 import org.vertx.testtools.TestVerticle;
 import org.vertx.testtools.VertxAssert;

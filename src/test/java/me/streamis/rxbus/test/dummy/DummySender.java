@@ -1,4 +1,4 @@
-package me.streamis.rxbus.test;
+package me.streamis.rxbus.test.dummy;
 
 import me.streamis.rxbus.MessageType;
 import me.streamis.rxbus.Sendable;

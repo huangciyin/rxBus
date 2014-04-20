@@ -1,4 +1,4 @@
-package me.streamis.rxbus.test;
+package me.streamis.rxbus.test.dummy;
 
 /**
  *

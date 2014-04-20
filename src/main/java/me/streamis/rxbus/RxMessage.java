@@ -24,9 +24,12 @@ public class RxMessage {
   }
 
   public String getType() {
-    if (message.body() instanceof JsonObject && type != null)
+    if (message.body() instanceof JsonObject) {
+      if (type == null) {
+        type = ((JsonObject) message.body()).getString(JsonParser.MSG_TYPE);
+      }
       return type;
-    else
+    } else
       throw new IllegalArgumentException("message should be json format.");
   }
 
@@ -38,7 +41,7 @@ public class RxMessage {
     Object body = message.body();
     if (body instanceof JsonObject && clazz != null) {
       JsonObject result = (JsonObject) body;
-      this.type = result.getString(JsonParser.MSG_TYPE);
+      if (type == null) this.type = result.getString(JsonParser.MSG_TYPE);
       if (isFail(result)) {
         //过滤逻辑错误
         result.removeField(JsonParser.FAILED);
