@@ -3,10 +3,15 @@ package me.streamis.rxbus.test.service;
 import me.streamis.rxbus.test.service.domain.Department;
 import me.streamis.rxbus.test.service.domain.User;
 
+import java.util.List;
+import java.util.Set;
+
 /**
  *
  */
 public interface UserService {
+
+  void hello();
 
   void addUser(User user);
 
@@ -16,7 +21,7 @@ public interface UserService {
 
   Department getDepartmentWithUser(User user);
 
-  //TODO: parameter with list
+  List<User> getUsersFromDepartment(Set<Department> departments);
 
-  //TODO: Exception
+  void somethingWrong() throws IllegalArgumentException;
 }

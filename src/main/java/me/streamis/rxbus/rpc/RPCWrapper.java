@@ -1,4 +1,7 @@
-package me.streamis.rxbus;
+package me.streamis.rxbus.rpc;
+
+import me.streamis.rxbus.MessageType;
+import me.streamis.rxbus.Sendable;
 
 import java.util.Arrays;
 
@@ -7,7 +10,7 @@ import java.util.Arrays;
  */
 @MessageType("__RxRpcRequest__")
 public class RPCWrapper implements Sendable {
-  private String interfaceName;
+  private String serviceName;
   private String methodName;
   private Object[] parameters;
 
@@ -15,18 +18,18 @@ public class RPCWrapper implements Sendable {
 
   }
 
-  public RPCWrapper(String interfaceName, String methodName, Object[] parameters) {
-    this.interfaceName = interfaceName;
+  public RPCWrapper(String serviceName, String methodName, Object[] parameters) {
+    this.serviceName = serviceName;
     this.methodName = methodName;
     this.parameters = parameters;
   }
 
-  public String getInterfaceName() {
-    return interfaceName;
+  public String getServiceName() {
+    return serviceName;
   }
 
-  public void setInterfaceName(String interfaceName) {
-    this.interfaceName = interfaceName;
+  public void setServiceName(String interfaceName) {
+    this.serviceName = interfaceName;
   }
 
   public String getMethodName() {
@@ -48,7 +51,7 @@ public class RPCWrapper implements Sendable {
   @Override
   public String toString() {
     return "RPCWrapper{" +
-        "interfaceName='" + interfaceName + '\'' +
+        "serviceName='" + serviceName + '\'' +
         ", methodName='" + methodName + '\'' +
         ", parameters=" + Arrays.toString(parameters) +
         '}';

@@ -4,7 +4,7 @@ import me.streamis.rxbus.MessageType;
 import me.streamis.rxbus.Sendable;
 
 @MessageType("__FAILED__")
-public class DummyFailureObject implements Sendable {
+public class DummyFailure implements Sendable {
   private String errorMsg;
   private String errorCode;
 
@@ -26,7 +26,7 @@ public class DummyFailureObject implements Sendable {
 
   @Override
   public String toString() {
-    return "DummyFailureObject{" +
+    return "DummyFailure{" +
         "errorMsg='" + errorMsg + '\'' +
         ", errorCode='" + errorCode + '\'' +
         '}';

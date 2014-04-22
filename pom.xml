@@ -6,7 +6,7 @@
 
   <groupId>me.streamis</groupId>
   <artifactId>rxBus</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.1.0</version>
 
   <name>Rx Bus for the Vert.x</name>
 

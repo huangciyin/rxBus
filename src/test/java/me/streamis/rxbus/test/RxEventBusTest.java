@@ -63,7 +63,7 @@ public class RxEventBusTest extends TestVerticle {
           @Override
           public void call(RxMessage rxMessage) {
             DummySender sender = rxMessage.body(DummySender.class);
-            assertEquals("WithDummySender", rxMessage.getType());
+            assertEquals("WithDummySender", rxMessage.getMessageType());
             assertEquals(sender.getName(), "dummy-name");
             assertEquals(sender.getId(), 100);
             assertEquals(2, sender.getCodes().size());
@@ -84,7 +84,7 @@ public class RxEventBusTest extends TestVerticle {
           @Override
           public void call(RxMessage message) {
             DummyReceive receive = message.body(DummyReceive.class);
-            assertEquals("DummyReceive", message.getType());
+            assertEquals("DummyReceive", message.getMessageType());
             assertTrue(receive.isResult());
             assertEquals(receive.getName(), "receive");
             assertEquals(2, receive.getCodes().size());
@@ -150,7 +150,7 @@ public class RxEventBusTest extends TestVerticle {
     rxBus.registerHandler(address).subscribe(new Action1<RxMessage>() {
       @Override
       public void call(RxMessage message) {
-        DummyFailureObject failureObject = new DummyFailureObject();
+        DummyFailure failureObject = new DummyFailure();
         failureObject.setErrorCode("errorCode");
         failureObject.setErrorMsg("errorMessage");
         message.reply(failureObject);

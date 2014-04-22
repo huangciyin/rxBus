@@ -7,6 +7,9 @@ import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonObject;
 import rx.Observable;
 
+import java.util.Collection;
+import java.util.Map;
+
 /**
  *
  */
@@ -31,10 +34,8 @@ public class RxEventBus {
       if (body instanceof JsonObject) {
         JsonObject result = (JsonObject) body;
         if (isFail(result)) {
-          //过滤逻辑错误
           result.removeField(JsonParser.FAILED);
           fireError(exHandler.handle(result));
-          return;
         }
       }
       fireNext(new RxMessage(message, exHandler, this));
@@ -49,7 +50,6 @@ public class RxEventBus {
         if (body instanceof JsonObject) {
           JsonObject result = (JsonObject) body;
           if (isFail(result)) {
-            //过滤逻辑错误
             result.removeField(JsonParser.FAILED);
             fireError(exHandler.handle(result));
             return;
@@ -66,11 +66,17 @@ public class RxEventBus {
     return Observable.create(new ReceiveHandler<R>() {
       @Override
       public void execute() {
-        if (object instanceof Sendable) {
+        if (object instanceof Sendable || object instanceof Map) {
           try {
-            eventBus.send(address, JsonParser.asJson(object), this);
+            eventBus.send(address, JsonParser.asJson(object).asObject(), this);
           } catch (Exception e) {
-            fireError(exHandler.handle(e));
+            fireError(e);
+          }
+        } else if (object instanceof Collection) {
+          try {
+            eventBus.send(address, JsonParser.asJson(object).asArray(), this);
+          } catch (Exception e) {
+            fireError(e);
           }
         } else {
           eventBus.send(address, object, (Handler) this);
@@ -87,7 +93,7 @@ public class RxEventBus {
           try {
             eventBus.sendWithTimeout(address, JsonParser.asJson(object), timeout, this);
           } catch (Exception e) {
-            fireError(exHandler.handle(e));
+            fireError(e);
           }
         } else {
           eventBus.sendWithTimeout(address, object, timeout, this);

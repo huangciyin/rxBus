@@ -1,4 +1,6 @@
-package me.streamis.rxbus;
+package me.streamis.rxbus.rpc;
+
+import me.streamis.rxbus.RxMessage;
 
 /**
  * RPC call parser

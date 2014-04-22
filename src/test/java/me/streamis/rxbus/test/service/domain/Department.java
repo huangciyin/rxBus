@@ -1,9 +1,11 @@
 package me.streamis.rxbus.test.service.domain;
 
+import me.streamis.rxbus.Sendable;
+
 /**
  *
  */
-public class Department {
+public class Department implements Sendable{
 
   private int id;
   private String name;

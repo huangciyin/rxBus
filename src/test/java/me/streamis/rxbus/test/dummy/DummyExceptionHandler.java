@@ -12,8 +12,5 @@ public class DummyExceptionHandler implements RxExceptionHandler<DummyException>
     return new DummyException("json error");
   }
 
-  @Override
-  public DummyException handle(Exception ex) {
-    return new DummyException(ex);
-  }
+
 }

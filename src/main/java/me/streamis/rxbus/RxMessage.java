@@ -1,11 +1,15 @@
 package me.streamis.rxbus;
 
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.eventbus.Message;
+import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import rx.Observable;
 
-import java.io.IOException;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  *
@@ -15,7 +19,7 @@ public class RxMessage {
   private Message message;
   private RxExceptionHandler exHandler;
   private SubscriptionHandler observer;
-  private String type;
+  private String messageType;
 
   public RxMessage(Message message, RxExceptionHandler exHandler, SubscriptionHandler observer) {
     this.message = message;
@@ -23,12 +27,12 @@ public class RxMessage {
     this.observer = observer;
   }
 
-  public String getType() {
+  public String getMessageType() {
     if (message.body() instanceof JsonObject) {
-      if (type == null) {
-        type = ((JsonObject) message.body()).getString(JsonParser.MSG_TYPE);
+      if (messageType == null) {
+        messageType = ((JsonObject) message.body()).getString(JsonParser.MSG_TYPE);
       }
-      return type;
+      return messageType;
     } else
       throw new IllegalArgumentException("message should be json format.");
   }
@@ -37,22 +41,34 @@ public class RxMessage {
     return json.getString(JsonParser.MSG_TYPE) != null && json.getString(JsonParser.MSG_TYPE).equals(JsonParser.FAILED);
   }
 
-  public <T> T body(Class clazz) {
+  public <T> T body(JavaType type) {
     Object body = message.body();
-    if (body instanceof JsonObject && clazz != null) {
+    if (body instanceof JsonObject && type != null) {
       JsonObject result = (JsonObject) body;
-      if (type == null) this.type = result.getString(JsonParser.MSG_TYPE);
+      if (this.messageType == null) this.messageType = result.getString(JsonParser.MSG_TYPE);
       if (isFail(result)) {
-        //过滤逻辑错误
         result.removeField(JsonParser.FAILED);
         observer.fireError(exHandler.handle(result));
       } else try {
-        return (T) JsonParser.asObject(result, clazz);
-      } catch (IOException e) {
-        observer.fireError(exHandler.handle(e));
+        return JsonParser.asObject(result, type);
+      } catch (Exception e) {
+        observer.fireError(e);
       }
+    } else if (body instanceof JsonArray && type != null) {
+      JsonArray resultArray = (JsonArray) body;
+      try {
+        return JsonParser.asObject(resultArray, type);
+      } catch (Exception e) {
+        observer.fireError(e);
+      }
+    } else {
+      observer.fireError(new IllegalArgumentException("unKnow format of message.."));
     }
     return null;
+  }
+
+  public <T> T body(Class<T> clazz) {
+    return body(TypeFactory.defaultInstance().constructType(clazz));
   }
 
   public <T> T body() {
@@ -93,11 +109,11 @@ public class RxMessage {
 
   public Observable<RxMessage> reply(final Object object) {
     ReplyHandler handler = new ReplyHandler<>();
-    if (object instanceof Sendable) {
+    if (object instanceof Sendable || object instanceof Collection || object instanceof Map) {
       try {
         message.reply(JsonParser.asJson(object), handler);
       } catch (Exception e) {
-        observer.fireError(e);
+        handler.fireError(e);
       }
     } else {
       message.reply(object, handler);
@@ -111,7 +127,7 @@ public class RxMessage {
       try {
         message.replyWithTimeout(JsonParser.asJson(object), timeout, handler);
       } catch (Exception e) {
-        observer.fireError(e);
+        handler.fireError(e);
       }
     } else {
       message.replyWithTimeout(object, timeout, handler);
