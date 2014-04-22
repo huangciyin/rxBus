@@ -1,6 +1,7 @@
 package me.streamis.rxbus.test;
 
 import me.streamis.rxbus.*;
+import me.streamis.rxbus.rpc.RPCException;
 import me.streamis.rxbus.rpc.RPCExceptionHandler;
 import me.streamis.rxbus.rpc.RPCInvoker;
 import me.streamis.rxbus.rpc.RPCWrapper;
@@ -162,6 +163,7 @@ public class RxRpcTest extends TestVerticle {
     }, new Action1<Throwable>() {
       @Override
       public void call(Throwable throwable) {
+        assertTrue(throwable instanceof RPCException);
         VertxAssert.testComplete();
       }
     });
