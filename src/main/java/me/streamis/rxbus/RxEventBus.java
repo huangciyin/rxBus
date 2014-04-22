@@ -36,6 +36,7 @@ public class RxEventBus {
         if (isFail(result)) {
           result.removeField(JsonParser.FAILED);
           fireError(exHandler.handle(result));
+          return;
         }
       }
       fireNext(new RxMessage(message, exHandler, this));
@@ -89,9 +90,15 @@ public class RxEventBus {
     return Observable.create(new AsyncReceiveHandler<R>() {
       @Override
       public void execute() {
-        if (object instanceof Sendable) {
+        if (object instanceof Sendable || object instanceof Map) {
           try {
-            eventBus.sendWithTimeout(address, JsonParser.asJson(object), timeout, this);
+            eventBus.sendWithTimeout(address, JsonParser.asJson(object).asObject(), timeout, this);
+          } catch (Exception e) {
+            fireError(e);
+          }
+        } else if (object instanceof Collection) {
+          try {
+            eventBus.sendWithTimeout(address, JsonParser.asJson(object).asArray(), timeout, this);
           } catch (Exception e) {
             fireError(e);
           }

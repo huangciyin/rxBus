@@ -123,7 +123,7 @@ public class RxMessage {
 
   public <R> Observable<RxMessage> replyWithTimeout(final Object object, final long timeout) {
     AsyncReplyHandler<R> handler = new AsyncReplyHandler<>();
-    if (object instanceof Sendable) {
+    if (object instanceof Sendable || object instanceof Collection || object instanceof Map) {
       try {
         message.replyWithTimeout(JsonParser.asJson(object), timeout, handler);
       } catch (Exception e) {
