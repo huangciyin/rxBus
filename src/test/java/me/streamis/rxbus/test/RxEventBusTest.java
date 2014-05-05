@@ -51,7 +51,6 @@ public class RxEventBusTest extends TestVerticle {
         VertxAssert.testComplete();
       }
     });
-
   }
 
   @Test

@@ -37,19 +37,20 @@ public class RxRpcTest extends TestVerticle {
     initialize();
     //service
     UserService userService = new UserServiceImpl();
+    String serviceName = UserServiceImpl.class.getName();
 
     rxBus = new RxEventBus(vertx.eventBus(), new RPCExceptionHandler());
 
-    //service mapping, you could set it from jsonObject.
+    //service mapping, could get this mapping from configuration in json format.
     Map<String, Object> serviceMapping = new HashMap<>();
-    serviceMapping.put("me.streamis.rxbus.test.service.UserServiceImpl", userService);
+    serviceMapping.put(serviceName, userService);
 
     //rpc invoker
     rpcInvoker = new DefaultRPCInvoker(serviceMapping);
     registerService();
 
     //service for client
-    userServiceVertx = new UserServiceVertxImpl(rxBus, address);
+    userServiceVertx = new UserServiceVertxImpl(rxBus, address, serviceName);
     startTests();
   }
 

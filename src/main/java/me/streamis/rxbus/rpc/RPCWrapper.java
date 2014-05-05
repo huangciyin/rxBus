@@ -6,7 +6,7 @@ import me.streamis.rxbus.Sendable;
 import java.util.Arrays;
 
 /**
- * 包装请求成为RPC bean
+ * RPC bean
  */
 @MessageType("__RxRpcRequest__")
 public class RPCWrapper implements Sendable {
