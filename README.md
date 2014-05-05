@@ -36,7 +36,7 @@ It's very easy to useing rpc in rxBus.
 
 First, we mock a service.
 
-    ```java
+    ```Java
     public interface UserService {
       void addUser(User user);
       
@@ -61,7 +61,7 @@ The difference of above interface is type of return. The detail of implement cou
 
 The next thing is listen request from client, we make register for rpc invoking.
 
-    ```java    
+    {% codeblock x.java %}
     rpcInvoker = new DefaultRPCInvoker(serviceMapping);
     
     rxBus.registerHandler(address).subscribe(new Action1<RxMessage>() {
@@ -78,7 +78,7 @@ The next thing is listen request from client, we make register for rpc invoking.
         }
       }
     });
-    ```
+    {% endcodeblock  %}
     
 `RPCWrapper` include all the rpc metadata, we invoking target service with this parameter.
 there is simple example about how to make rpc in client.
