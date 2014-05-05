@@ -1,13 +1,12 @@
 rxBus
 =====
 
-Enhance EventBus of vert.x with rx pattern and Java Bean, we make this have refrence the project [mod-rxJava](https://github.com/vert-x/mod-rxvertx)
-This moulde let you send Java Object over EventBus, and other week language also could decode Java Object in json format.
+Enhance EventBus of vert.x with rx pattern and Java Bean, which refer to the project [mod-rxJava](https://github.com/vert-x/mod-rxvertx)
+You can send POJO over EventBus by this module, and other week language also can decode POJO in json format.
 
-All the object that send with EventBus hava to implement interface of `Sendable` which mean this Object should be encode as json format.
+All the object that send by EventBus hava to implement interface of `Sendable` which mean this Object should be encode as json format.
 there is example [DummySender](https://github.com/stream1984/rxBus/blob/master/src/test/java/me/streamis/rxbus/test/dummy/DummySender.java)
 
-    ```java
     @MessageType("WithDummySender")
     public class DummySender implements Sendable {
       private int id;
@@ -15,12 +14,12 @@ there is example [DummySender](https://github.com/stream1984/rxBus/blob/master/s
       private List<String> codes;
     }
 
-Ok, maybe you have notice an annotation of `@MessageType`, this annotation indicate a message type. We could get type of object with method `instanceOf` in java, this is not work in  week language. so we wrap message add a field of string which indicate message type. You could get this type by `rxMessage.getMessageType();` in java.
+Ok, maybe you have notice an annotation of `@MessageType`, this annotation indicate a message type. We could get type of object with method `instanceOf` in java, it doesn't work in week language. so we wrap message with adding a field of string which indicate message type. You could get this type by `rxMessage.getMessageType();` in java.
 
-In js, you should get message type explicitly by `message.__MSG_TYPE__`. Yes, field of `__MSG_TYPE__` be added by mod for tell from type of message.
+In javascipt, you could get message type explicitly by `message.__MSG_TYPE__`. Yes, field of `__MSG_TYPE__` be added by mod for distinguish type from message.
 
 Ok, next, you could invoke rxBus send Object as you wish.
-there is a example which include all the situation.
+there is a example which include all cases.
 [RxEventBusExample](https://github.com/stream1984/rxBus/blob/master/src/test/java/me/streamis/rxbus/test/RxEventBusTest.java)
 
 
@@ -29,7 +28,7 @@ RPC invoke
 
 The RPC invoking is common in distribution service, and we could provide service with vert.x in old project which all the request is synchronism.
 
-It's very easy to useing rpc in rxBus.
+It's very easy to using rpc in rxBus.
 
 * mapping service's class.
 * make a wrapper for vert.x's client to invoke.
@@ -44,7 +43,7 @@ First, we mock a service.
       List<User> getUsersFromDepartment(Set<Department> departments);
     }
 
-as you can see, all the method is synchronism, we should make warpper for client of vert.x to invoke.
+as you will see, all the method is synchronism, we should make warpper for client of vert.x to invoke.
 
     public interface UserServiceVertx {
       Observable<Void> addUser(User user);
@@ -56,7 +55,7 @@ as you can see, all the method is synchronism, we should make warpper for client
 
 The difference of above interface is type of return. The detail of implement could be find in [UserServiceVertxImpl](https://github.com/stream1984/rxBus/blob/master/src/test/java/me/streamis/rxbus/test/service/client/UserServiceVertxImpl.java)
 
-The next thing is listen request from client, we make register for rpc invoking.
+Then listen request from client, we make register for rpc invoking.
 
     rpcInvoker = new DefaultRPCInvoker(serviceMapping);
     
@@ -76,7 +75,7 @@ The next thing is listen request from client, we make register for rpc invoking.
     });
     
 `RPCWrapper` include all the rpc metadata, we invoking target service with this parameter.
-there is simple example about how to make rpc in client.
+here is simple example about how to make rpc in client.
 
     Department department = new Department();
     department.setId(1);
@@ -97,7 +96,7 @@ there is simple example about how to make rpc in client.
     });
 
     
-We have to be care that type of return is not be wrapped by `RxMessage`, since rpc don't have to reply message to original sender.
+We have to be care of type of return which is not be wrapped by `RxMessage`, since rpc don't have to reply message to original sender.
 
 Compile & install
 ====
@@ -112,7 +111,7 @@ then deploy `me.streamis~rxBus~0.1.0` to your project, with mod.json `include : 
 
 Or
 
-dependency this lib directly with maven:
+depend on this lib directly with maven:
 
     <dependency>
       <groupId>me.streamis</groupId>
@@ -121,7 +120,7 @@ dependency this lib directly with maven:
     </dependency>
     
 
-any feedback is welcome.
+any feedbacks is welcome.
 
 
 
