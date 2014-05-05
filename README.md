@@ -37,7 +37,6 @@ It's very easy to useing rpc in rxBus.
 First, we mock a service.
 
     ```java
-    
     public interface UserService {
       void addUser(User user);
       
@@ -45,11 +44,10 @@ First, we mock a service.
       
       List<User> getUsersFromDepartment(Set<Department> departments);
     }
-
+    ```
 as you can see, all the method is synchronism, we should make warpper for client of vert.x to invoke.
 
-    ```java
-    
+    ```java 
     public interface UserServiceVertx {
       Observable<Void> addUser(User user);
 
@@ -57,13 +55,13 @@ as you can see, all the method is synchronism, we should make warpper for client
 
       Observable<List<User>> getUsersFromDepartment(Set<Department> departments);
     }
+    ```
 
 The difference of above interface is type of return. The detail of implement could be find in [UserServiceVertxImpl](https://github.com/stream1984/rxBus/blob/master/src/test/java/me/streamis/rxbus/test/service/client/UserServiceVertxImpl.java)
 
 The next thing is listen request from client, we make register for rpc invoking.
 
-    ```java
-    
+    ```java    
     rpcInvoker = new DefaultRPCInvoker(serviceMapping);
     
     rxBus.registerHandler(address).subscribe(new Action1<RxMessage>() {
@@ -80,12 +78,12 @@ The next thing is listen request from client, we make register for rpc invoking.
         }
       }
     });
-
+    ```
+    
 `RPCWrapper` include all the rpc metadata, we invoking target service with this parameter.
 there is simple example about how to make rpc in client.
 
-    ```java
-    
+    ```java    
     Department department = new Department();
     department.setId(1);
     department.setName("IT");
@@ -103,7 +101,8 @@ there is simple example about how to make rpc in client.
         VertxAssert.testComplete();
       }
     });
-
+    ```
+    
 We have to be care that type of return is not be wrapped by `RxMessage`, since rpc don't have to reply message to original sender.
 
 Compile & install
