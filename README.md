@@ -7,6 +7,7 @@ This moulde let you send Java Object over EventBus, and other week language also
 All the object that send with EventBus hava to implement interface of `Sendable` which mean this Object should be encode as json format.
 there is example [DummySender](https://github.com/stream1984/rxBus/blob/master/src/test/java/me/streamis/rxbus/test/dummy/DummySender.java)
 
+    ```java
     @MessageType("WithDummySender")
     public class DummySender implements Sendable {
       private int id;
@@ -35,6 +36,7 @@ It's very easy to useing rpc in rxBus.
 
 First, we mock a service.
 
+    ```java
     public interface UserService {
       void addUser(User user);
       
@@ -45,6 +47,7 @@ First, we mock a service.
 
 as you can see, all the method is synchronism, we should make warpper for client of vert.x to invoke.
 
+    ```java
     public interface UserServiceVertx {
       Observable<Void> addUser(User user);
 
@@ -57,6 +60,7 @@ The difference of above interface is type of return. The detail of implement cou
 
 The next thing is listen request from client, we make register for rpc invoking.
 
+    ```java
     rpcInvoker = new DefaultRPCInvoker(serviceMapping);
     
     rxBus.registerHandler(address).subscribe(new Action1<RxMessage>() {
@@ -77,6 +81,7 @@ The next thing is listen request from client, we make register for rpc invoking.
 `RPCWrapper` include all the rpc metadata, we invoking target service with this parameter.
 there is simple example about how to make rpc in client.
 
+    ```java
     Department department = new Department();
     department.setId(1);
     department.setName("IT");
@@ -106,9 +111,20 @@ and
 
 `mvn install`
 
-then deploy `me.streamis~rxBus~0.1.0` to your project.
+then deploy `me.streamis~rxBus~0.1.0` to your project, with mod.json `include : "me.streamis~rxBus~0.1.0"`
 
-and feedback is welcome.
+Or
+
+dependency this lib directly with maven:
+
+    <dependency>
+      <groupId>me.streamis</groupId>
+      <artifactId>rxBus</artifactId>
+      <version>0.1.0</version>
+    </dependency>
+    
+
+any feedback is welcome.
 
 
 
