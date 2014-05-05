@@ -37,6 +37,7 @@ It's very easy to useing rpc in rxBus.
 First, we mock a service.
 
     ```java
+    
     public interface UserService {
       void addUser(User user);
       
@@ -48,6 +49,7 @@ First, we mock a service.
 as you can see, all the method is synchronism, we should make warpper for client of vert.x to invoke.
 
     ```java
+    
     public interface UserServiceVertx {
       Observable<Void> addUser(User user);
 
@@ -61,6 +63,7 @@ The difference of above interface is type of return. The detail of implement cou
 The next thing is listen request from client, we make register for rpc invoking.
 
     ```java
+    
     rpcInvoker = new DefaultRPCInvoker(serviceMapping);
     
     rxBus.registerHandler(address).subscribe(new Action1<RxMessage>() {
@@ -82,6 +85,7 @@ The next thing is listen request from client, we make register for rpc invoking.
 there is simple example about how to make rpc in client.
 
     ```java
+    
     Department department = new Department();
     department.setId(1);
     department.setName("IT");
