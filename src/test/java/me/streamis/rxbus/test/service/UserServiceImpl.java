@@ -1,6 +1,7 @@
 package me.streamis.rxbus.test.service;
 
 import me.streamis.rxbus.test.service.domain.Department;
+import me.streamis.rxbus.test.service.domain.Status;
 import me.streamis.rxbus.test.service.domain.User;
 
 import java.util.ArrayList;
@@ -15,7 +16,8 @@ import static org.junit.Assert.assertEquals;
 public class UserServiceImpl implements UserService {
 
   @Override
-  public void hello() {
+  public void hello(Status status) {
+    assertEquals(status, Status.SUCCESS);
     System.out.println("test null parameter");
   }
 

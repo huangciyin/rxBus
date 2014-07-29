@@ -6,6 +6,7 @@ import me.streamis.rxbus.RxEventBus;
 import me.streamis.rxbus.rpc.RPCWrapper;
 import me.streamis.rxbus.rpc.ResultWrapper;
 import me.streamis.rxbus.test.service.domain.Department;
+import me.streamis.rxbus.test.service.domain.Status;
 import me.streamis.rxbus.test.service.domain.User;
 import rx.Observable;
 
@@ -21,6 +22,7 @@ public class UserServiceVertxImpl implements UserServiceVertx {
   private final RxEventBus rxEventBus;
   private final String serviceAddress;
   private final TypeFactory typeFactory = TypeFactory.defaultInstance();
+  private final long timeout = 2000;
 
   public UserServiceVertxImpl(RxEventBus rxEventBus, String address, String serviceName) {
     this.rxEventBus = rxEventBus;
@@ -29,35 +31,35 @@ public class UserServiceVertxImpl implements UserServiceVertx {
   }
 
   @Override
-  public Observable<Void> hello() {
-    RPCWrapper rpcWrapper = new RPCWrapper(serviceName, "hello", null);
-    return rxEventBus.send(serviceAddress, rpcWrapper).flatMap(new ResultWrapper<Void>());
+  public Observable<Void> hello(Status status) {
+    RPCWrapper rpcWrapper = new RPCWrapper(serviceName, "hello", new Object[]{Status.class, status});
+    return rxEventBus.sendWithTimeout(serviceAddress, rpcWrapper, timeout).flatMap(new ResultWrapper<Void>());
   }
 
   @Override
   public Observable<Void> addUser(User user) {
     RPCWrapper rpcWrapper = new RPCWrapper(serviceName, "addUser", new Object[]{User.class, user});
-    return rxEventBus.send(serviceAddress, rpcWrapper).flatMap(new ResultWrapper<Void>());
+    return rxEventBus.sendWithTimeout(serviceAddress, rpcWrapper, timeout).flatMap(new ResultWrapper<Void>());
   }
 
   @Override
   public Observable<Boolean> updateUserId(int id) {
     RPCWrapper rpcWrapper = new RPCWrapper(serviceName, "updateUserId", new Object[]{int.class, id});
-    return rxEventBus.send(serviceAddress, rpcWrapper).flatMap(new ResultWrapper<Boolean>());
+    return rxEventBus.sendWithTimeout(serviceAddress, rpcWrapper, timeout).flatMap(new ResultWrapper<Boolean>());
   }
 
   @Override
   public Observable<Void> addUserToDepartment(User user, Department department) {
     RPCWrapper rpcWrapper = new RPCWrapper(serviceName, "addUserToDepartment",
         new Object[]{User.class, user, Department.class, department});
-    return rxEventBus.send(serviceAddress, rpcWrapper).flatMap(new ResultWrapper<Void>());
+    return rxEventBus.sendWithTimeout(serviceAddress, rpcWrapper, timeout).flatMap(new ResultWrapper<Void>());
   }
 
   @Override
   public Observable<Department> getDepartmentWithUser(User user) {
     JavaType resultType = typeFactory.constructFromCanonical(Department.class.getName());
     RPCWrapper rpcWrapper = new RPCWrapper(serviceName, "getDepartmentWithUser", new Object[]{User.class, user});
-    return rxEventBus.send(serviceAddress, rpcWrapper).flatMap(new ResultWrapper<Department>(resultType));
+    return rxEventBus.sendWithTimeout(serviceAddress, rpcWrapper, timeout).flatMap(new ResultWrapper<Department>(resultType));
   }
 
   @Override
@@ -65,12 +67,12 @@ public class UserServiceVertxImpl implements UserServiceVertx {
     JavaType paramType = typeFactory.constructCollectionType(Set.class, Department.class);
     JavaType resultType = typeFactory.constructCollectionType(List.class, User.class);
     RPCWrapper rpcWrapper = new RPCWrapper(serviceName, "getUsersFromDepartment", new Object[]{paramType, departments});
-    return rxEventBus.send(serviceAddress, rpcWrapper).flatMap(new ResultWrapper<List<User>>(resultType));
+    return rxEventBus.sendWithTimeout(serviceAddress, rpcWrapper, timeout).flatMap(new ResultWrapper<List<User>>(resultType));
   }
 
   @Override
   public Observable<Void> somethingWrong() {
     RPCWrapper rpcWrapper = new RPCWrapper(serviceName, "somethingWrong", null);
-    return rxEventBus.send(serviceAddress, rpcWrapper).flatMap(new ResultWrapper<Void>());
+    return rxEventBus.sendWithTimeout(serviceAddress, rpcWrapper, timeout).flatMap(new ResultWrapper<Void>());
   }
 }

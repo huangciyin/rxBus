@@ -9,6 +9,7 @@ import me.streamis.rxbus.test.service.UserService;
 import me.streamis.rxbus.test.service.client.UserServiceVertx;
 import me.streamis.rxbus.test.service.client.UserServiceVertxImpl;
 import me.streamis.rxbus.test.service.domain.Department;
+import me.streamis.rxbus.test.service.domain.Status;
 import me.streamis.rxbus.test.service.domain.User;
 import me.streamis.rxbus.test.service.UserServiceImpl;
 import org.junit.Test;
@@ -69,6 +70,17 @@ public class RxRpcTest extends TestVerticle {
           default:
             break;
         }
+      }
+    });
+  }
+
+  @Test
+  public void hello() {
+    Observable<Void> result = userServiceVertx.hello(Status.SUCCESS);
+    result.subscribe(new Action1<Void>() {
+      @Override
+      public void call(Void aVoid) {
+        VertxAssert.testComplete();
       }
     });
   }

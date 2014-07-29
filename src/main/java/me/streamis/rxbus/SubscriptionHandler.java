@@ -11,7 +11,7 @@ import rx.Subscription;
  */
 abstract class SubscriptionHandler<R, T> implements Observable.OnSubscribe<R>, Subscription, Handler<T> {
 
-  private Observer observer;
+  private Observer<? super R> observer;
 
   public void execute() {
   }

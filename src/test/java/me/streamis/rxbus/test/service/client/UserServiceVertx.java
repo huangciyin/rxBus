@@ -2,6 +2,7 @@ package me.streamis.rxbus.test.service.client;
 
 
 import me.streamis.rxbus.test.service.domain.Department;
+import me.streamis.rxbus.test.service.domain.Status;
 import me.streamis.rxbus.test.service.domain.User;
 import rx.Observable;
 
@@ -13,7 +14,7 @@ import java.util.Set;
  */
 public interface UserServiceVertx {
 
-  Observable<Void> hello();
+  Observable<Void> hello(Status status);
 
   Observable<Void> addUser(User user);
 

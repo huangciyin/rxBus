@@ -56,12 +56,20 @@ public class DefaultRPCInvoker implements RPCInvoker {
           String classStr = (String) parameters[i];
           Object value;
           JavaType javaType = TypeFactory.defaultInstance().constructFromCanonical(classStr);
+          Object parameter = parameters[i + 1];
           if (javaType.isCollectionLikeType()) {
-            value = JsonParser.asObject(new JsonArray((List) parameters[i + 1]), javaType);
+            value = JsonParser.asObject(new JsonArray((List) parameter), javaType);
           } else if (javaType.isPrimitive()) {
-            value = parameters[i + 1];
+            value = parameter;
+          } else if (javaType.isEnumType()) {
+            Enum[] enums = (Enum[]) javaType.getRawClass().getEnumConstants();
+            value = parameter;
+            for (Enum e : enums) {
+              if (e.name().equals(value))
+                value = e;
+            }
           } else {
-            value = JsonParser.asObject(new JsonObject((Map) parameters[i + 1]), javaType);
+            value = JsonParser.asObject(new JsonObject((Map) parameter), javaType);
           }
           classes[index] = javaType.getRawClass();
           values[index] = value;

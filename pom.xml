@@ -6,7 +6,7 @@
 
   <groupId>me.streamis</groupId>
   <artifactId>rxBus</artifactId>
-  <version>0.1.0</version>
+  <version>0.1.1</version>
 
   <name>Rx Bus for the Vert.x</name>
 
@@ -14,10 +14,10 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <module.name>${project.groupId}~${project.artifactId}~${project.version}</module.name>
     <!--Dependency versions-->
-    <vertx.version>2.1RC3</vertx.version>
+    <vertx.version>2.1.2</vertx.version>
     <vertx.testtools.version>2.0.3-final</vertx.testtools.version>
     <junit.version>4.11</junit.version>
-    <rxjava.version>0.17.5</rxjava.version>
+    <rxjava.version>0.20.0-RC3</rxjava.version>
 
     <!--Plugin versions-->
     <maven.compiler.plugin.version>3.0</maven.compiler.plugin.version>
@@ -31,6 +31,45 @@
     <maven.dependency.plugin.version>2.7</maven.dependency.plugin.version>
   </properties>
 
+  <repositories>
+    <repository>
+      <id>public</id>
+      <name>Public Repositories</name>
+      <url>http://10.10.10.16:8081/nexus/content/groups/public</url>
+    </repository>
+    <repository>
+      <id>releases</id>
+      <name>Internal Releases</name>
+      <url>http://10.10.10.16:8081/nexus/content/repositories/releases</url>
+    </repository>
+    <repository>
+      <id>snapshots</id>
+      <name>Internal Releases</name>
+      <url>http://10.10.10.16:8081/nexus/content/repositories/snapshots</url>
+    </repository>
+  </repositories>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>public</id>
+      <name>Public Repositories</name>
+      <url>http://10.10.10.16:8081/nexus/content/groups/public</url>
+    </pluginRepository>
+  </pluginRepositories>
+
+  <distributionManagement>
+    <repository>
+      <id>releases</id>
+      <name>Internal Releases</name>
+      <url>http://10.10.10.16:8081/nexus/content/repositories/releases</url>
+    </repository>
+    <snapshotRepository>
+      <id>snapshots</id>
+      <name>Internal Releases</name>
+      <url>http://10.10.10.16:8081/nexus/content/repositories/snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>
+
   <dependencies>
     <dependency>
       <groupId>io.vertx</groupId>
@@ -42,6 +81,12 @@
       <groupId>io.vertx</groupId>
       <artifactId>vertx-platform</artifactId>
       <version>${vertx.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>2.2.2</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -63,6 +108,7 @@
       <version>${vertx.testtools.version}</version>
       <scope>test</scope>
     </dependency>
+
   </dependencies>
 
   <build>
@@ -198,7 +244,6 @@
           </execution>
         </executions>
       </plugin>
-
     </plugins>
   </build>
 

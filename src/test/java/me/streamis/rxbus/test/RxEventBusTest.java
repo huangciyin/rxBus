@@ -61,12 +61,12 @@ public class RxEventBusTest extends TestVerticle {
         new Action1<RxMessage>() {
           @Override
           public void call(RxMessage rxMessage) {
-            DummySender sender = rxMessage.body(DummySender.class);
+            //we should know message type, since we dependency it to convert message to Java Object.
             assertEquals("WithDummySender", rxMessage.getMessageType());
+            DummySender sender = rxMessage.body(DummySender.class);
             assertEquals(sender.getName(), "dummy-name");
             assertEquals(sender.getId(), 100);
             assertEquals(2, sender.getCodes().size());
-
             DummyReceive receive = new DummyReceive();
             receive.setName("receive");
             receive.setResult(true);
