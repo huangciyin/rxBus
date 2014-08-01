@@ -1,6 +1,7 @@
 package com.ilegendsoft.vertx.mod.eventbus.client;
 
 import org.vertx.java.core.AsyncResult;
+import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.buffer.Buffer;
@@ -516,34 +517,33 @@ public class EventBusBridgeClient implements EventBus, Handler<WebSocket> {
   @Override
   public EventBus unregisterHandler(String address, Handler<? extends Message> handler, Handler<AsyncResult<Void>> asyncResultHandler) {
     eb.unregisterHandler(address, handler, asyncResultHandler);
+    handlerMap.remove(address);
     sendMessage(MessageCategory.UNREGISTER, address, null, null, null);
     return this;
   }
 
   @Override
   public EventBus unregisterHandler(String address, Handler<? extends Message> handler) {
-    eb.unregisterHandler(address, handler);
-    sendMessage(MessageCategory.UNREGISTER, address, null, null, null);
-    return this;
+    return unregisterHandler(address, handler, null);
   }
 
   @Override
-  public EventBus registerHandler(String address, Handler<? extends Message> handler, Handler<AsyncResult<Void>> asyncResultHandler) {
+  public EventBus registerHandler(String address, Handler<? extends Message> handler, final Handler<AsyncResult<Void>> asyncResultHandler) {
     eb.registerHandler(address, handler, asyncResultHandler);
+    handlerMap.put(address, handler);
     sendMessage(MessageCategory.REGISTER, address, null, null, null);
     return this;
   }
 
   @Override
   public EventBus registerHandler(String address, Handler<? extends Message> handler) {
-    eb.registerHandler(address, handler);
-    sendMessage(MessageCategory.REGISTER, address, null, null, null);
-    return this;
+    return registerHandler(address, handler, null);
   }
 
   @Override
   public EventBus registerLocalHandler(String address, Handler<? extends Message> handler) {
     eb.registerLocalHandler(address, handler);
+    handlerMap.put(address, handler);
     return this;
   }
 

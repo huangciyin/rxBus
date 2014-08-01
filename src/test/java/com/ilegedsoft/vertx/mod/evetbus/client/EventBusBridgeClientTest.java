@@ -4,6 +4,7 @@ import com.ilegendsoft.vertx.mod.eventbus.client.EventBusBridgeClient;
 import org.junit.Test;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.VertxFactory;
 import org.vertx.java.core.eventbus.EventBus;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.eventbus.ReplyException;
@@ -22,7 +23,7 @@ import org.vertx.testtools.VertxAssert;
 public class EventBusBridgeClientTest extends TestVerticle {
 
   //This eventbus is based on sockJS client.
-  private EventBus eb;
+  private EventBus eventBusClientInAnotherVertx;
 
   @Override
   public void start() {
@@ -33,17 +34,19 @@ public class EventBusBridgeClientTest extends TestVerticle {
     permitted.add(new JsonObject());
 
     SockJSServer sockJSServer = vertx.createSockJSServer(server);
+    sockJSServer.setHook(new ServerHook(container.logger()));
     sockJSServer.bridge(new JsonObject().putString("prefix", "/eventbus"), permitted, permitted);
-    server.listen(8080, new Handler<AsyncResult<HttpServer>>() {
+    server.listen(8088, new Handler<AsyncResult<HttpServer>>() {
       @Override
       public void handle(AsyncResult<HttpServer> event) {
+        //register bus in the server side
         registerEventBus(new Handler<AsyncResult<Void>>() {
           @Override
           public void handle(AsyncResult<Void> event) {
             HttpClient httpClient = vertx.createHttpClient();
-            httpClient.setHost("localhost").setPort(8080);
+            httpClient.setHost("localhost").setPort(8088);
             //
-            eb = new EventBusBridgeClient(vertx, httpClient, "eventbus", new Handler<AsyncResult<WebSocket>>() {
+            eventBusClientInAnotherVertx = new EventBusBridgeClient(VertxFactory.newVertx(), httpClient, "eventbus", new Handler<AsyncResult<WebSocket>>() {
               @Override
               public void handle(AsyncResult<WebSocket> event) {
                 //we have to make sure connection have been established.
@@ -57,7 +60,7 @@ public class EventBusBridgeClientTest extends TestVerticle {
   }
 
   private void registerEventBus(final Handler<AsyncResult<Void>> completeHandler) {
-    vertx.eventBus().registerHandler("eventbus", new Handler<Message<JsonObject>>() {
+    vertx.eventBus().registerHandler("busAddress", new Handler<Message<JsonObject>>() {
       @Override
       public void handle(Message<JsonObject> event) {
         VertxAssert.assertNotNull(event.body());
@@ -75,7 +78,7 @@ public class EventBusBridgeClientTest extends TestVerticle {
   @Test
   public void send() {
     final JsonObject msg = new JsonObject().putString("test", "test");
-    eb.send("eventbus", msg, new Handler<Message<JsonObject>>() {
+    eventBusClientInAnotherVertx.send("busAddress", msg, new Handler<Message<JsonObject>>() {
       @Override
       public void handle(Message<JsonObject> event) {
         assertSend(event);
@@ -88,7 +91,7 @@ public class EventBusBridgeClientTest extends TestVerticle {
   @Test
   public void sendWithTimeout() {
     final JsonObject msg = new JsonObject().putString("test", "test");
-    eb.sendWithTimeout("eventbus", msg, 3000, new Handler<AsyncResult<Message<JsonObject>>>() {
+    eventBusClientInAnotherVertx.sendWithTimeout("busAddress", msg, 3000, new Handler<AsyncResult<Message<JsonObject>>>() {
       @Override
       public void handle(AsyncResult<Message<JsonObject>> event) {
         assertSend(event.result());
@@ -99,7 +102,7 @@ public class EventBusBridgeClientTest extends TestVerticle {
 
   @Test
   public void noHandlerException() {
-    eb.sendWithTimeout("errorAddress", new JsonObject(), 3000, new Handler<AsyncResult<Message<JsonObject>>>() {
+    eventBusClientInAnotherVertx.sendWithTimeout("errorAddress", new JsonObject(), 3000, new Handler<AsyncResult<Message<JsonObject>>>() {
       @Override
       public void handle(AsyncResult<Message<JsonObject>> event) {
         VertxAssert.assertTrue("should be failed.", event.failed());
@@ -112,17 +115,19 @@ public class EventBusBridgeClientTest extends TestVerticle {
   @Test
   public void registerPublish() {
     final JsonObject msg = new JsonObject().putString("test", "test");
-    eb.registerHandler("someAddress", new Handler<Message<JsonObject>>() {
+    //register bus by client
+    eventBusClientInAnotherVertx.registerHandler("someAddress", new Handler<Message<JsonObject>>() {
       @Override
       public void handle(Message<JsonObject> event) {
         VertxAssert.assertNotNull(event.body());
         VertxAssert.assertEquals("test", event.body().getString("test"));
         VertxAssert.testComplete();
       }
-    }, new Handler<AsyncResult<Void>>() {
+    });
+    vertx.setTimer(2000, new Handler<Long>() {
       @Override
-      public void handle(AsyncResult<Void> event) {
-        eb.publish("someAddress", msg);
+      public void handle(Long event) {
+        eventBusClientInAnotherVertx.publish("someAddress", msg);
       }
     });
   }
