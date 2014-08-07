@@ -14,6 +14,7 @@ import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.http.WebSocket;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
+import org.vertx.java.core.json.impl.Base64;
 import org.vertx.java.core.sockjs.SockJSServer;
 import org.vertx.testtools.TestVerticle;
 import org.vertx.testtools.VertxAssert;
