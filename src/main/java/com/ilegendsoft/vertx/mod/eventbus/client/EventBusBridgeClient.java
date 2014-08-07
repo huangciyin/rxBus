@@ -517,14 +517,15 @@ public class EventBusBridgeClient implements EventBus, Handler<WebSocket> {
   @Override
   public EventBus unregisterHandler(String address, Handler<? extends Message> handler, Handler<AsyncResult<Void>> asyncResultHandler) {
     eb.unregisterHandler(address, handler, asyncResultHandler);
-    handlerMap.remove(address);
     sendMessage(MessageCategory.UNREGISTER, address, null, null, null);
     return this;
   }
 
   @Override
   public EventBus unregisterHandler(String address, Handler<? extends Message> handler) {
-    return unregisterHandler(address, handler, null);
+    eb.unregisterHandler(address, handler);
+    sendMessage(MessageCategory.UNREGISTER, address, null, null, null);
+    return this;
   }
 
   @Override
@@ -543,7 +544,6 @@ public class EventBusBridgeClient implements EventBus, Handler<WebSocket> {
   @Override
   public EventBus registerLocalHandler(String address, Handler<? extends Message> handler) {
     eb.registerLocalHandler(address, handler);
-    handlerMap.put(address, handler);
     return this;
   }
 

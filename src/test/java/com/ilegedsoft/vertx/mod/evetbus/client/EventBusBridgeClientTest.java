@@ -1,6 +1,7 @@
 package com.ilegedsoft.vertx.mod.evetbus.client;
 
 import com.ilegendsoft.vertx.mod.eventbus.client.EventBusBridgeClient;
+
 import org.junit.Test;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
@@ -74,6 +75,34 @@ public class EventBusBridgeClientTest extends TestVerticle {
     VertxAssert.assertNotNull(event.body());
     VertxAssert.assertEquals("reply-test", event.body().getString("test"));
   }
+
+  @Test
+  public void sendByteArray() {
+    final byte[] bytes = "test send bytes".getBytes();
+    final String address = "byteMessageAddress";
+
+    vertx.eventBus().registerHandler(address, new Handler<Message<String>>() {
+      @Override
+      public void handle(Message<String> event) {
+        VertxAssert.assertEquals(Base64.encodeBytes(bytes), event.body());
+        String receive = event.body();
+        event.reply(receive);
+      }
+    }, new Handler<AsyncResult<Void>>() {
+      @Override
+      public void handle(AsyncResult<Void> event) {
+        VertxAssert.assertTrue(event.succeeded());
+        eventBusClientInAnotherVertx.send(address, bytes, new Handler<Message<String>>() {
+          @Override
+          public void handle(Message<String> event) {
+            VertxAssert.assertEquals(Base64.encodeBytes(bytes), event.body());
+            VertxAssert.testComplete();
+          }
+        });
+      }
+    });
+  }
+
 
   @Test
   public void send() {
