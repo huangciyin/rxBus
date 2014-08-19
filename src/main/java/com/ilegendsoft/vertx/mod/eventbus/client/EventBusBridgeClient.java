@@ -1,7 +1,6 @@
 package com.ilegendsoft.vertx.mod.eventbus.client;
 
 import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.buffer.Buffer;
@@ -14,6 +13,7 @@ import org.vertx.java.core.http.WebSocket;
 import org.vertx.java.core.impl.DefaultFutureResult;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
+import org.vertx.java.core.shareddata.Shareable;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Created by Stream.
  */
-public class EventBusBridgeClient implements EventBus, Handler<WebSocket> {
+public class EventBusBridgeClient implements Shareable, EventBus, Handler<WebSocket> {
 
   private EventBus eb;
   private final Vertx vertx;
@@ -31,9 +31,11 @@ public class EventBusBridgeClient implements EventBus, Handler<WebSocket> {
   private long pingTimerID;
   private Handler<AsyncResult<WebSocket>> completeHandler;
   private static final String BUS_ADDRESS_PREFIX = "eventBusBridgeClient_";
+  private final String webSocketURI;
   private static final long PING_INTERVAL = 10000;
   private SocketStatus socketStatus;
   private final AtomicLong replySequence = new AtomicLong(0);
+  private HttpClient httpClient;
 
   private enum MessageCategory {
     SEND, PUBLISH, REGISTER, UNREGISTER, PING
@@ -43,20 +45,33 @@ public class EventBusBridgeClient implements EventBus, Handler<WebSocket> {
     CONNECTING, OPEN, CLOSING, CLOSED
   }
 
-  public EventBusBridgeClient(Vertx vertx, HttpClient httpClient, String prefix, Handler<AsyncResult<WebSocket>> completeHandler) {
-    this.vertx = vertx;
-    this.eb = vertx.eventBus();
-    this.completeHandler = completeHandler;
-    this.socketStatus = SocketStatus.CONNECTING;
-    httpClient.connectWebsocket(String.format("/%s/websocket", prefix), this);
+  public EventBusBridgeClient(Vertx vertx, String prefix) {
+    this(vertx, prefix, null, null);
   }
 
+  public EventBusBridgeClient(Vertx vertx, String prefix, HttpClient httpClient, Handler<AsyncResult<WebSocket>> completeHandler) {
+    this.vertx = vertx;
+    this.eb = vertx.eventBus();
+    this.socketStatus = SocketStatus.CONNECTING;
+    this.webSocketURI = String.format("/%s/websocket", prefix);
+    if (completeHandler != null) this.completeHandler = completeHandler;
+    if (httpClient != null) {
+      this.httpClient = httpClient;
+      this.httpClient.connectWebsocket(webSocketURI, this);
+    }
+  }
+
+  public void connect(HttpClient httpClient, Handler<AsyncResult<WebSocket>> completeHandler) {
+    if (completeHandler != null) this.completeHandler = completeHandler;
+    this.httpClient = httpClient;
+    this.httpClient.connectWebsocket(webSocketURI, this);
+  }
 
   @Override
   public void handle(WebSocket socket) {
     this.socket = socket;
     this.socketStatus = SocketStatus.OPEN;
-    completeHandler.handle(new DefaultFutureResult<>(socket));
+    if (completeHandler != null) completeHandler.handle(new DefaultFutureResult<>(socket));
     //send ping
     sendMessage(MessageCategory.PING, null, null, null, null);
     pingTimerID = vertx.setPeriodic(PING_INTERVAL, new Handler<Long>() {

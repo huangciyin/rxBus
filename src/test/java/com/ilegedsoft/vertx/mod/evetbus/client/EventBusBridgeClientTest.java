@@ -48,9 +48,15 @@ public class EventBusBridgeClientTest extends TestVerticle {
             HttpClient httpClient = vertx.createHttpClient();
             httpClient.setHost("localhost").setPort(8088);
             //
-            eventBusClientInAnotherVertx = new EventBusBridgeClient(VertxFactory.newVertx(), httpClient, "eventbus", new Handler<AsyncResult<WebSocket>>() {
+            eventBusClientInAnotherVertx = new EventBusBridgeClient(VertxFactory.newVertx(), "eventbus", httpClient, new Handler<AsyncResult<WebSocket>>() {
               @Override
               public void handle(AsyncResult<WebSocket> event) {
+                event.result().endHandler(new Handler<Void>() {
+                  @Override
+                  public void handle(Void event) {
+                    System.out.println("socket closed.");
+                  }
+                });
                 //we have to make sure connection have been established.
                 startTests();
               }

@@ -11,7 +11,7 @@ Make sure threre is httpclient to the server which have been bridge with sockjs.
     HttpClient httpClient = vertx.createHttpClient();
 	httpClient.setHost("localhost").setPort(8080);
 	
-    EventBus eb = new EventBusBridgeClient(vertx, httpClient, "eventbus", new Handler<AsyncResult<WebSocket>>() {
+    EventBus eb = new EventBusBridgeClient(vertx, "eventbus", httpClient, new Handler<AsyncResult<WebSocket>>() {
               @Override
               public void handle(AsyncResult<WebSocket> event) {
                 //we have to make sure connection have been established.
