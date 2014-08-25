@@ -179,6 +179,7 @@ public class EventBusBridgeClient implements Shareable, EventBus, Handler<WebSoc
     checkOpen();
     socketStatus = SocketStatus.CLOSING;
     socket.close();
+    httpClient.close();
     vertx.runOnContext(new Handler<Void>() {
       @Override
       public void handle(Void event) {
