@@ -28,23 +28,30 @@ class JsonParser {
   }
 
   static <T> JsonElement asJson(T obj) throws Exception {
-    JsonElement json;
+    JsonElement jsonElement;
     if (obj instanceof Sendable) {
-      json = new JsonObject(mapper.writeValueAsString(obj));
+      jsonElement = new JsonObject(mapper.writeValueAsString(obj));
       MessageType messageType = obj.getClass().getAnnotation(MessageType.class);
-      if (messageType != null && messageType.value() != null) {
-        ((JsonObject) json).putString(MSG_TYPE, messageType.value());
+      if (messageType != null) {
+        JsonObject json = jsonElement.asObject();
+        if (!messageType.value().equals("")) {
+          json.putString(MSG_TYPE, messageType.value());
+        } else if (messageType.fail()) {
+          json.putString(MSG_TYPE, FAILED);
+        } else {
+          json.putString(MSG_TYPE, obj.getClass().getSimpleName());
+        }
       }
     } else if (obj instanceof Collection) {
-      json = new JsonArray();
-      JsonArray jsonArray = json.asArray();
+      jsonElement = new JsonArray();
+      JsonArray jsonArray = jsonElement.asArray();
       for (Object element : (Collection) obj) jsonArray.add(asJson(element));
     } else if (obj instanceof Map) {
-      json = new JsonObject((Map) obj);
+      jsonElement = new JsonObject((Map) obj);
     } else {
       throw new IllegalArgumentException("parameter for the json should be implements Sendable");
     }
-    return json;
+    return jsonElement;
   }
 
   static <T> T asObject(JsonElement source, JavaType type) throws Exception {

@@ -4,6 +4,10 @@ import me.streamis.rxbus.RxEventBus;
 import me.streamis.rxbus.RxMessage;
 import me.streamis.rxbus.test.dummy.*;
 import org.junit.Test;
+import org.vertx.java.core.AsyncResult;
+import org.vertx.java.core.AsyncResultHandler;
+import org.vertx.java.core.eventbus.Message;
+import org.vertx.java.core.eventbus.ReplyException;
 import org.vertx.testtools.TestVerticle;
 import org.vertx.testtools.VertxAssert;
 import rx.Observable;
@@ -11,9 +15,12 @@ import rx.functions.Action1;
 import rx.functions.Func1;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  *
@@ -28,6 +35,12 @@ public class RxEventBusTest extends TestVerticle {
     initialize();
     rxBus = new RxEventBus(vertx.eventBus(), new DummyExceptionHandler());
     startTests();
+    vertx.eventBus().sendWithTimeout("", 1, 1, new AsyncResultHandler<Message<Integer>>() {
+      @Override
+      public void handle(AsyncResult<Message<Integer>> event) {
+
+      }
+    });
   }
 
   @Test
@@ -51,6 +64,37 @@ public class RxEventBusTest extends TestVerticle {
         VertxAssert.testComplete();
       }
     });
+  }
+
+  @Test
+  public void echoMap() {
+    Observable<RxMessage> obsRegister = rxBus.registerHandler(address);
+    obsRegister.subscribe(new Action1<RxMessage>() {
+      @Override
+      public void call(RxMessage rxMessage) {
+        Map map = rxMessage.body(Map.class);
+        assertEquals(map.get("test"), "test");
+        map.put("test", "test1");
+        rxMessage.reply(map);
+      }
+    });
+    Map<String, String> map = new HashMap<>();
+    map.put("test", "test");
+    rxBus.send(address, map).subscribe(new Action1<RxMessage>() {
+      @Override
+      public void call(RxMessage rxMessage) {
+        Map map = rxMessage.body(Map.class);
+        assertEquals(map.get("test"), "test1");
+        VertxAssert.testComplete();
+      }
+    }, new Action1<Throwable>() {
+      @Override
+      public void call(Throwable throwable) {
+        throwable.printStackTrace();
+        VertxAssert.testComplete();
+      }
+    });
+
   }
 
   @Test
@@ -156,7 +200,7 @@ public class RxEventBusTest extends TestVerticle {
       }
     });
 
-    Observable<RxMessage> obs = rxBus.send(address, getDummySender());
+    Observable<RxMessage> obs = rxBus.sendWithTimeout(address, getDummySender(), 2000);
     obs.subscribe(
         new Action1<RxMessage>() {
           public void call(RxMessage dummyReceive) {
@@ -173,10 +217,28 @@ public class RxEventBusTest extends TestVerticle {
     );
   }
 
+  @Test
+  public void failWithTimeout() {
+    rxBus.sendWithTimeout("bad-Address", "test", 500).subscribe(new Action1<RxMessage>() {
+      @Override
+      public void call(RxMessage rxMessage) {
+        VertxAssert.fail("should be json error");
+      }
+    }, new Action1<Throwable>() {
+      @Override
+      public void call(Throwable e) {
+        assertNotNull(e);
+        assertTrue(e instanceof ReplyException);
+        VertxAssert.testComplete();
+      }
+    });
+  }
+
 
   private DummySender getDummySender() {
     DummySender dummy = new DummySender();
     dummy.setId(100);
+    dummy.setResult(true);
     dummy.setName("dummy-name");
     List<String> codes = new ArrayList<>();
     codes.add("one");

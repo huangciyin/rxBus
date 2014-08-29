@@ -13,6 +13,8 @@ public class DummySender implements Sendable {
   private int id;
   private String name;
   private List<String> codes;
+  private boolean result;
+
 
   public int getId() {
     return id;
@@ -36,6 +38,14 @@ public class DummySender implements Sendable {
 
   public void setCodes(List<String> codes) {
     this.codes = codes;
+  }
+
+  public boolean isResult() {
+    return result;
+  }
+
+  public void setResult(boolean result) {
+    this.result = result;
   }
 
   @Override

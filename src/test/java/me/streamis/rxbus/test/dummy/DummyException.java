@@ -4,18 +4,13 @@ package me.streamis.rxbus.test.dummy;
  *
  */
 public class DummyException extends RuntimeException {
-  public DummyException() {
-  }
 
-  public DummyException(String message) {
+  private String code;
+
+  public DummyException(String code, String message) {
     super(message);
+    this.code = code;
   }
 
-  public DummyException(String message, Throwable cause) {
-    super(message, cause);
-  }
 
-  public DummyException(Throwable cause) {
-    super(cause);
-  }
 }

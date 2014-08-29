@@ -15,12 +15,16 @@ import java.util.Map;
  */
 public class RxEventBus {
 
-  private final EventBus eventBus;
+  private EventBus eventBus;
   private final RxExceptionHandler exHandler;
 
   public RxEventBus(EventBus eventBus, RxExceptionHandler exHandler) {
     this.eventBus = eventBus;
     this.exHandler = exHandler;
+  }
+
+  public void setEventBus(EventBus eventBus) {
+    this.eventBus = eventBus;
   }
 
   private boolean isFail(JsonObject json) {
@@ -34,7 +38,7 @@ public class RxEventBus {
       if (body instanceof JsonObject) {
         JsonObject result = (JsonObject) body;
         if (isFail(result)) {
-          result.removeField(JsonParser.FAILED);
+          result.removeField(JsonParser.MSG_TYPE);
           fireError(exHandler.handle(result));
           return;
         }
@@ -51,7 +55,7 @@ public class RxEventBus {
         if (body instanceof JsonObject) {
           JsonObject result = (JsonObject) body;
           if (isFail(result)) {
-            result.removeField(JsonParser.FAILED);
+            result.removeField(JsonParser.MSG_TYPE);
             fireError(exHandler.handle(result));
             return;
           }

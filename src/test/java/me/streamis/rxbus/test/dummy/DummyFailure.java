@@ -3,7 +3,7 @@ package me.streamis.rxbus.test.dummy;
 import me.streamis.rxbus.MessageType;
 import me.streamis.rxbus.Sendable;
 
-@MessageType("__FAILED__")
+@MessageType(fail = true)
 public class DummyFailure implements Sendable {
   private String errorMsg;
   private String errorCode;

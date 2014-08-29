@@ -65,8 +65,10 @@ public class DefaultRPCInvoker implements RPCInvoker {
             Enum[] enums = (Enum[]) javaType.getRawClass().getEnumConstants();
             value = parameter;
             for (Enum e : enums) {
-              if (e.name().equals(value))
+              if (e.name().equals(value)) {
                 value = e;
+                break;
+              }
             }
           } else {
             value = JsonParser.asObject(new JsonObject((Map) parameter), javaType);
