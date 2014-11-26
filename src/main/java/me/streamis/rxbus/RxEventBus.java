@@ -9,6 +9,8 @@ import rx.Observable;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
@@ -17,6 +19,7 @@ public class RxEventBus {
 
   private EventBus eventBus;
   private final RxExceptionHandler exHandler;
+  private Map<String, ReceiveHandler> receiveHandlers = new ConcurrentHashMap<>();
 
   public RxEventBus(EventBus eventBus, RxExceptionHandler exHandler) {
     this.eventBus = eventBus;
@@ -114,20 +117,38 @@ public class RxEventBus {
   }
 
   public <T> Observable<RxMessage> registerLocalHandler(final String address) {
-    return Observable.create(new ReceiveHandler<T>() {
+    ReceiveHandler<T> handler = new ReceiveHandler<T>() {
       @Override
       public void execute() {
         eventBus.registerLocalHandler(address, this);
       }
-    });
+    };
+    receiveHandlers.put(address, handler);
+    return Observable.create(handler);
   }
 
   public <T> Observable<RxMessage> registerHandler(final String address) {
-    return Observable.create(new ReceiveHandler<T>() {
+    ReceiveHandler<T> handler = new ReceiveHandler<T>() {
       @Override
       public void execute() {
         eventBus.registerHandler(address, this);
       }
-    });
+    };
+    receiveHandlers.put(address, handler);
+    return Observable.create(handler);
   }
+
+  public void unRegisterHandler(String address) {
+    ReceiveHandler handler = receiveHandlers.remove(address);
+    if (handler != null)
+      eventBus.unregisterHandler(address, handler);
+  }
+
+  public void unRegisterAllHandlers() {
+    for (String address : receiveHandlers.keySet()) {
+      unRegisterHandler(address);
+    }
+    receiveHandlers.clear();
+  }
+
 }

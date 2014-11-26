@@ -1,4 +1,4 @@
-package me.streamis.rxbus.test.service.client;
+package me.streamis.rxbus.test.service;
 
 
 import me.streamis.rxbus.test.service.domain.Department;
@@ -19,6 +19,8 @@ public interface UserServiceVertx {
   Observable<Void> addUser(User user);
 
   Observable<Boolean> updateUserId(int id);
+
+  Observable<String> queryName(String name);
 
   Observable<Void> addUserToDepartment(User user, Department department);
 

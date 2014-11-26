@@ -1,17 +1,16 @@
 package me.streamis.rxbus.test;
 
-import me.streamis.rxbus.*;
+import me.streamis.rxbus.DefaultRPCInvoker;
+import me.streamis.rxbus.RxEventBus;
 import me.streamis.rxbus.rpc.RPCException;
 import me.streamis.rxbus.rpc.RPCExceptionHandler;
-import me.streamis.rxbus.rpc.RPCInvoker;
-import me.streamis.rxbus.rpc.RPCWrapper;
 import me.streamis.rxbus.test.service.UserService;
-import me.streamis.rxbus.test.service.client.UserServiceVertx;
-import me.streamis.rxbus.test.service.client.UserServiceVertxImpl;
+import me.streamis.rxbus.test.service.UserServiceImpl;
+import me.streamis.rxbus.test.service.UserServiceVertx;
+import me.streamis.rxbus.test.service.UserServiceVertxClientImpl;
 import me.streamis.rxbus.test.service.domain.Department;
 import me.streamis.rxbus.test.service.domain.Status;
 import me.streamis.rxbus.test.service.domain.User;
-import me.streamis.rxbus.test.service.UserServiceImpl;
 import org.junit.Test;
 import org.vertx.testtools.TestVerticle;
 import org.vertx.testtools.VertxAssert;
@@ -27,11 +26,10 @@ import static org.junit.Assert.assertTrue;
 /**
  *
  */
-public class RxRpcTest extends TestVerticle {
+public class DefaultRxRpcTest extends TestVerticle {
 
   private RxEventBus rxBus;
   private String address = "rxBus.address";
-  private RPCInvoker rpcInvoker;
   private UserServiceVertx userServiceVertx;
 
   public void start() {
@@ -47,31 +45,9 @@ public class RxRpcTest extends TestVerticle {
     serviceMapping.put(serviceName, userService);
 
     //rpc invoker
-    rpcInvoker = new DefaultRPCInvoker(serviceMapping);
-    registerService();
-
-    //service for client
-    userServiceVertx = new UserServiceVertxImpl(rxBus, address, serviceName);
+    new DefaultRPCInvoker(rxBus, serviceMapping, address);
+    userServiceVertx = new UserServiceVertxClientImpl(rxBus, address, serviceName);
     startTests();
-  }
-
-  /**
-   * register bus handler with address
-   */
-  private void registerService() {
-    rxBus.registerHandler(address).subscribe(new Action1<RxMessage>() {
-      @Override
-      public void call(RxMessage rxMessage) {
-        switch (rxMessage.getMessageType()) {
-          case RPCInvoker.RPCMessage:
-            RPCWrapper rpcWrapper = rxMessage.body(RPCWrapper.class);
-            rpcInvoker.call(rpcWrapper, rxMessage);
-            break;
-          default:
-            break;
-        }
-      }
-    });
   }
 
   @Test

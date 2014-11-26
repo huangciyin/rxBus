@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>me.streamis</groupId>
@@ -10,15 +11,15 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <nexus.develop.host>10.10.10.16:8081</nexus.develop.host>
+    <nexus.develop.host>10.10.10.137:8081</nexus.develop.host>
     <nexus.production.host>54.164.163.132:8081</nexus.production.host>
-    
+
     <module.name>${project.groupId}~${project.artifactId}~${project.version}</module.name>
     <!--Dependency versions-->
-    <vertx.version>2.1.2</vertx.version>
+    <vertx.version>2.1.5</vertx.version>
     <vertx.testtools.version>2.0.3-final</vertx.testtools.version>
     <junit.version>4.11</junit.version>
-    <rxjava.version>0.20.3</rxjava.version>
+    <rxjava.version>1.0.0</rxjava.version>
 
     <!--Plugin versions-->
     <maven.compiler.plugin.version>3.0</maven.compiler.plugin.version>
@@ -91,11 +92,10 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>com.netflix.rxjava</groupId>
-      <artifactId>rxjava-core</artifactId>
+      <groupId>io.reactivex</groupId>
+      <artifactId>rxjava</artifactId>
       <version>${rxjava.version}</version>
     </dependency>
-
     <!--Test dependencies-->
     <dependency>
       <groupId>junit</groupId>
@@ -125,7 +125,7 @@
         </configuration>
       </plugin>
 
-			<plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
         <version>2.5</version>
@@ -133,10 +133,10 @@
           <useReleaseProfile>false</useReleaseProfile>
           <checkModificationExcludes>
             <checkModificationExclude>pom.xml</checkModificationExclude>
-					</checkModificationExcludes>
+          </checkModificationExcludes>
           <goals>deploy</goals>
-					<arguments>-DskipTests</arguments>
-          <arguments>-Ppro</arguments>					
+          <arguments>-DskipTests</arguments>
+          <arguments>-Ppro</arguments>
         </configuration>
       </plugin>
 

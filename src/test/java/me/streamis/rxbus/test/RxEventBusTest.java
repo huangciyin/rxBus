@@ -146,6 +146,40 @@ public class RxEventBusTest extends TestVerticle {
 
 
   @Test
+  public void bytes() {
+    Observable<RxMessage> obsRegister = rxBus.registerHandler(address);
+    obsRegister.subscribe(
+        new Action1<RxMessage>() {
+          @Override
+          public void call(RxMessage rxMessage) {
+            System.out.println(rxMessage.body());
+            rxMessage.reply("ok");
+          }
+        }, new Action1<Throwable>() {
+          @Override
+          public void call(Throwable throwable) {
+            VertxAssert.fail(throwable.getMessage());
+          }
+        });
+
+    rxBus.send(address, new byte[]{}).subscribe(
+        new Action1<RxMessage>() {
+          @Override
+          public void call(RxMessage rxMessage) {
+            VertxAssert.assertEquals("ok", rxMessage.body());
+            VertxAssert.testComplete();
+          }
+        },
+        new Action1<Throwable>() {
+          @Override
+          public void call(Throwable throwable) {
+            VertxAssert.fail(throwable.getMessage());
+          }
+        }
+    );
+  }
+
+  @Test
   public void serial() {
     //register
     Observable<RxMessage> obsRegister = rxBus.registerHandler(address);

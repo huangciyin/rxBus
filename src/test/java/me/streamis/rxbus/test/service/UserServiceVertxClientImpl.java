@@ -1,4 +1,4 @@
-package me.streamis.rxbus.test.service.client;
+package me.streamis.rxbus.test.service;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
@@ -16,15 +16,15 @@ import java.util.Set;
 /**
  *
  */
-public class UserServiceVertxImpl implements UserServiceVertx {
+public class UserServiceVertxClientImpl implements UserServiceVertx {
 
   private final String serviceName;
   private final RxEventBus rxEventBus;
   private final String serviceAddress;
   private final TypeFactory typeFactory = TypeFactory.defaultInstance();
-  private final long timeout = 2000;
+  private final long timeout = 20000;
 
-  public UserServiceVertxImpl(RxEventBus rxEventBus, String address, String serviceName) {
+  public UserServiceVertxClientImpl(RxEventBus rxEventBus, String address, String serviceName) {
     this.rxEventBus = rxEventBus;
     this.serviceAddress = address;
     this.serviceName = serviceName;
@@ -40,6 +40,12 @@ public class UserServiceVertxImpl implements UserServiceVertx {
   public Observable<Void> addUser(User user) {
     RPCWrapper rpcWrapper = new RPCWrapper(serviceName, "addUser", new Object[]{User.class, user});
     return rxEventBus.sendWithTimeout(serviceAddress, rpcWrapper, timeout).flatMap(new ResultWrapper<Void>());
+  }
+
+  @Override
+  public Observable<String> queryName(String name) {
+    RPCWrapper rpcWrapper = new RPCWrapper(serviceName, "queryName", new Object[]{String.class, name});
+    return rxEventBus.sendWithTimeout(serviceAddress, rpcWrapper, timeout).flatMap(new ResultWrapper<String>());
   }
 
   @Override
