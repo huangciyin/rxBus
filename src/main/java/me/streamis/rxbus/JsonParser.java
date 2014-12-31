@@ -4,6 +4,7 @@ package me.streamis.rxbus;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonElement;
 import org.vertx.java.core.json.JsonObject;
@@ -45,7 +46,14 @@ class JsonParser {
     } else if (obj instanceof Collection) {
       jsonElement = new JsonArray();
       JsonArray jsonArray = jsonElement.asArray();
-      for (Object element : (Collection) obj) jsonArray.add(asJson(element));
+      for (Object element : (Collection) obj) {
+        JavaType javaType = TypeFactory.defaultInstance().uncheckedSimpleType(element.getClass());
+        if (javaType.isPrimitive() || javaType.getRawClass() == String.class) {
+          jsonArray.add(element);
+        } else {
+          jsonArray.add(asJson(element));
+        }
+      }
     } else if (obj instanceof Map) {
       jsonElement = new JsonObject((Map) obj);
     } else {

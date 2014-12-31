@@ -46,6 +46,14 @@ public class UserServiceVertxServerImpl implements UserServiceVertx {
   }
 
   @Override
+  public Observable<List<String>> getNames() {
+    List<String> names = new ArrayList<>();
+    names.add("name1");
+    names.add("name2");
+    return Observable.just(names);
+  }
+
+  @Override
   public Observable<Void> addUserToDepartment(User user, Department department) {
     assertEquals("stream", user.getName());
     assertEquals(1, user.getId());

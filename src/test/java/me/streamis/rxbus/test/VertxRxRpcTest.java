@@ -4,7 +4,6 @@ import me.streamis.rxbus.RxEventBus;
 import me.streamis.rxbus.VertxRPCInvoker;
 import me.streamis.rxbus.rpc.RPCException;
 import me.streamis.rxbus.rpc.RPCExceptionHandler;
-import me.streamis.rxbus.rpc.RPCInvoker;
 import me.streamis.rxbus.test.service.UserServiceVertx;
 import me.streamis.rxbus.test.service.UserServiceVertxClientImpl;
 import me.streamis.rxbus.test.service.UserServiceVertxServerImpl;
@@ -33,7 +32,7 @@ public class VertxRxRpcTest extends TestVerticle {
     initialize();
     //service
     UserServiceVertx userService = new UserServiceVertxServerImpl();
-    String serviceName = UserServiceVertxServerImpl.class.getName();
+    String serviceName = UserServiceVertx.class.getName();
 
     RxEventBus rxBus = new RxEventBus(vertx.eventBus(), new RPCExceptionHandler());
 
@@ -175,4 +174,23 @@ public class VertxRxRpcTest extends TestVerticle {
       }
     });
   }
+
+  @Test
+  public void getNames() {
+    userServiceVertx.getNames().subscribe(
+        new Action1<List<String>>() {
+          @Override
+          public void call(List<String> strings) {
+            assertTrue(strings.size() == 2);
+            VertxAssert.testComplete();
+          }
+        },
+        new Action1<Throwable>() {
+          @Override
+          public void call(Throwable throwable) {
+            throwable.printStackTrace();
+          }
+        });
+  }
+
 }

@@ -22,7 +22,7 @@ public class UserServiceVertxClientImpl implements UserServiceVertx {
   private final RxEventBus rxEventBus;
   private final String serviceAddress;
   private final TypeFactory typeFactory = TypeFactory.defaultInstance();
-  private final long timeout = 20000;
+  private final long timeout = 10000;
 
   public UserServiceVertxClientImpl(RxEventBus rxEventBus, String address, String serviceName) {
     this.rxEventBus = rxEventBus;
@@ -46,6 +46,13 @@ public class UserServiceVertxClientImpl implements UserServiceVertx {
   public Observable<String> queryName(String name) {
     RPCWrapper rpcWrapper = new RPCWrapper(serviceName, "queryName", new Object[]{String.class, name});
     return rxEventBus.sendWithTimeout(serviceAddress, rpcWrapper, timeout).flatMap(new ResultWrapper<String>());
+  }
+
+  @Override
+  public Observable<List<String>> getNames() {
+    RPCWrapper rpcWrapper = new RPCWrapper(serviceName, "getNames", null);
+    JavaType resultType = typeFactory.constructCollectionType(List.class, String.class);
+    return rxEventBus.sendWithTimeout(serviceAddress, rpcWrapper, timeout).flatMap(new ResultWrapper<List<String>>(resultType));
   }
 
   @Override

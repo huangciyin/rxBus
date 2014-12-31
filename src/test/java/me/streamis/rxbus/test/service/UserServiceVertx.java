@@ -22,6 +22,8 @@ public interface UserServiceVertx {
 
   Observable<String> queryName(String name);
 
+  Observable<List<String>> getNames();
+
   Observable<Void> addUserToDepartment(User user, Department department);
 
   Observable<Department> getDepartmentWithUser(User user);
