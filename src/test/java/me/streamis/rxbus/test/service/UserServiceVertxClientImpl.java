@@ -22,7 +22,7 @@ public class UserServiceVertxClientImpl implements UserServiceVertx {
   private final RxEventBus rxEventBus;
   private final String serviceAddress;
   private final TypeFactory typeFactory = TypeFactory.defaultInstance();
-  private final long timeout = 10000;
+  private final long timeout = 5000;
 
   public UserServiceVertxClientImpl(RxEventBus rxEventBus, String address, String serviceName) {
     this.rxEventBus = rxEventBus;
